@@ -37,7 +37,7 @@ springdoc.swagger-ui.path=/swagger-ui.html
 
 1. Démarrez votre application Spring Boot
 2. Accédez à l'interface Swagger UI via le navigateur à l'URL suivante :
-```bash
+```
 localhost:8080/swagger-ui.html
 ```
 
