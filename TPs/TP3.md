@@ -97,7 +97,6 @@ Nous avons maintenant bien tout les prérequis pour attaquer sereinement ce TP.
    - **Spring Web** (pour créer l'API REST)
    - **Spring Data JPA** (pour la gestion des données avec JPA/Hibernate)
    - **PostgreSQL Driver** (pour se connecter à PostgreSQL)
-   - **Spring Boot DevTools** (pour le rechargement à chaud)
 
 4. Cliquez sur **Generate** pour télécharger le projet.
 
