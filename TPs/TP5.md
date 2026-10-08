@@ -14,11 +14,11 @@ L'objectif est de créer une application web Spring Boot qui consomme une API RE
 2. Configurez le projet avec les paramètres suivants :
    - **Project** : Maven Project
    - **Language** : Java
-   - **Spring Boot** : Version 3.3.4
+   - **Spring Boot** : Version 4.1.1
    - **Group** : `com.example`
    - **Artifact** : `mywebapp`
    - **Packaging** : Jar
-   - **Java** : 17
+   - **Java** : 21
 
 3. Ajoutez les **dépendances** suivantes :
    - **Spring Web** : Pour construire l'application web (Contrôleurs REST).
