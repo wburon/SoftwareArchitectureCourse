@@ -10,7 +10,7 @@
 
 ## Prérequis
 
-- Avoir **Java 17** ou une version plus récente installée.
+- Avoir **Java 21** ou une version plus récente installée.
 - Avoir **Maven** installé.
 - Installer **PostgreSQL** et le configurer (créer une base de données).
 - Avoir un IDE tel que **IntelliJ IDEA**, **Eclipse**, ou **VSCode** avec support Java.
@@ -44,7 +44,7 @@ Java version: 17.0.12, vendor: Ubuntu, runtime: /usr/lib/jvm/java-17-openjdk-amd
 Default locale: en, platform encoding: UTF-8
 OS name: "linux", version: "5.15.0-1073-azure", arch: "amd64", family: "unix"
 ```
-- Question : Est-ce Maven utilise bien la version Java que nous venons d'installer ?
+- Question : Est-ce Maven utilise bien la version Java 21 ?
 
 Vérifions maintenant que Postgres est installé et qu'une base de données existes déjà.
 ```sh
@@ -54,12 +54,13 @@ Normalement si tout se passe bien vous devriez voir apparaitre une sortie de la 
 ```sh
 psql (PostgreSQL) 12.20 (Ubuntu 12.20-0ubuntu0.20.04.1)
 ```
+Dans le cas contraire, psql doit être installé avec la commande suivante
 ```sh
-sudo apt update && apt install PostgreSQL postgresql-contrib
+sudo apt update && sudo apt install postgresql postgresql-contrib
 ```
 Testons maintenant la connexion à Postgres.
 ```sh
-dev $ sudo -u postgres psql
+sudo -u postgres psql
 ```
 Cela vous connectera à l'interface interactive de PostgreSQL si tout est configuré correctement. Une fois connecté, vous verrez un prompt psql comme ceci :
 ```
@@ -67,13 +68,15 @@ postgres=#
 ```
 Avec la commande "\l" vous listez toutes les bases de données pour vérifier que PostgreSQL fonctionne correctement.
 Il est nécessaire pour la suite du TP de voir au moins apparaitre la base de données nommé "postgres".
+
+Modifier le mot de passe d'accès à la base de donnée avec la commande 
+```
+ALTER USER postgres WITH PASSWORD 'password';
+```
 Pour quitter le prompt postgres tapez simplement "exit".
 
 Vérifions maintenant qu'un IDE est disponible sur la machine virtuelle.
-Par exemple pour démarrer IntelliJ IDEA : 
-```sh
-dev $ idea
-```
+Par exemple IntelliJ IDEA.
 
 Nous avons maintenant bien tout les prérequis pour attaquer sereinement ce TP.
 
@@ -83,13 +86,12 @@ Nous avons maintenant bien tout les prérequis pour attaquer sereinement ce TP.
 2. Configurez le projet comme suit :
    - **Project**: Maven Project
    - **Language**: Java
-   - **Spring Boot**: 3.3.4
+   - **Spring Boot**: 4.1.1
    - **Group**: `com.example`
    - **Artifact**: `my-api`
-   - **Name**: `MyApi`
-   - **Package Name**: `com.example.myapi`
+   - **Package Name**: `com.example.my-api`
    - **Packaging**: Jar
-   - **Java Version**: 17
+   - **Java Version**: 21
 
 3. Dans la section "Dependencies", ajoutez les dépendances suivantes :
    - **Spring Web** (pour créer l'API REST)
@@ -100,10 +102,21 @@ Nous avons maintenant bien tout les prérequis pour attaquer sereinement ce TP.
 4. Cliquez sur **Generate** pour télécharger le projet.
 
 5. Extrayez le fichier ZIP et ouvrez-le dans votre IDE.
+Vous devez maintenant avoir un répertoire "my-api" dans votre répertoire de travail.
+
+6. On tente un premier package de l'application.
 ```sh
-dev $ unzip my-api.zip -d ../workspace
+mvn package -DskipTests
 ```
-Vous devez maintenant avoir un répertoire "my-api" dans le repertoire "workspace".
+Si une erreur du type "Le réseau n'est pas accessible" apparait exécuté les instruction suivante :
+```sh
+nano ~/.mavenrc
+```
+Ajouter la ligne suivante puis enregistrer.
+```
+MAVEN_OPTS="-Djava.net.preferIPv6Addresses=true"
+```
+Relancer la packaging de l'application pour vérifier le bon fonctionnement.
 
 ---
 
@@ -126,10 +139,10 @@ spring.jpa.hibernate.ddl-auto=update
 ---
 ## Étape 3 : Créer une entité JPA
 
-1. Créez un nouveau package com.example.myapi.model
+1. Créez un nouveau package com.example.my_api.model
 2. Ajoutez une classe Product pour représenter une entité de produit
 ```java
-package com.example.myapi.model;
+package com.example.my_api.model;
 
 import jakarta.persistence.*;
 
@@ -182,12 +195,12 @@ Hint : Si vous ajoutez la dependance Lombok vous n'aurez plus a déclarer les co
 ---
 ## Étape 4 : Créer un Repository
 
-1. Créez un package com.example.myapi.repository.
+1. Créez un package com.example.my_api.repository.
 2. Ajoutez une interface ProductRepository qui étend JpaRepository :
 ```java
-package com.example.myapi.repository;
+package com.example.my_api.repository;
 
-import com.example.myapi.model.Product;
+import com.example.my_api.model.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -199,13 +212,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 ## Étape 5 : Créer un Service
 
-1. Créez un package com.example.myapi.service.
+1. Créez un package com.example.my_api.service.
 2. Ajoutez une classe ProductService pour gérer la logique métier de l'application :
 ```java
-package com.example.myapi.service;
+package com.example.my_api.service;
 
-import com.example.myapi.model.Product;
-import com.example.myapi.repository.ProductRepository;
+import com.example.my_api.model.Product;
+import com.example.my_api.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -229,14 +242,13 @@ public class ProductService {
 
 ## Étape 6 : Créer un Controller
 
-1. Créez un package com.example.myapi.controller.
+1. Créez un package com.example.my_api.controller.
 2. Ajoutez une classe ProductController pour définir les endpoints REST :
 ```java
-package com.example.myapi.controller;
+package com.example.my_api.controller;
 
-import com.example.myapi.model.Product;
-import com.example.myapi.service.ProductService;
-import org.springframework.http.HttpStatus;
+import com.example.my_api.model.Product;
+import com.example.my_api.service.ProductService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -282,13 +294,13 @@ Vous devez donc être capable :
 - de modifier un produit dans la base de données
 - de supprimer un produit dans la base données
 
-- Question : Alors que nous n'avons jamais crée de table dans la base de données, comment peut-on y stoker des données ? 
+- Question : Alors que nous n'avons jamais crée de table dans la base de données, comment peut-on y stocker des données ? 
 
 ## Étape 9 : Pour les plus rapide du groupe
 
 Etes-vous capable d'ajouter une colonne dans le modèle comme par exemple une date de fin de commercialisation et ainsi adapter les services CRUD.
 
-Ajoutez égalementun service search pour obtenir la liste des produits disponible à une date donnée.
+Ajoutez également un service search pour obtenir la liste des produits disponible à une date donnée.
 
 Vous obtiendrez ainsi une API avec les opérations du SCRUD !
 
