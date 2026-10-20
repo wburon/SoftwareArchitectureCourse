@@ -368,7 +368,7 @@ Completer `addProduct` comme ceci.
         final String payload;
         try {
             payload = objectMapper.writeValueAsString(event);
-        } catch (JsonProcessingException exception) {
+        } catch (JacksonException exception) {
             throw new IllegalStateException(
                     "Impossible de sérialiser l'événement ProductCreated",
                     exception
@@ -453,6 +453,11 @@ public class RabbitMQConfiguration {
     @Bean
     public Queue productCreatedQueue() {
         return new Queue("product.created", true);
+    }
+
+    @Bean
+    public ApplicationRunner declareQueue(AmqpAdmin amqpAdmin, Queue queue) {
+        return args -> amqpAdmin.declareQueue(queue);
     }
 }
 ```
